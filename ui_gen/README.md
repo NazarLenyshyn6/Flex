@@ -12,7 +12,7 @@ UIGen provides a foundation for building AI-powered development tools through th
 
 Core architecture provides functional CLI and MCP management with prompt composition system.
 
-## Architecture
+## Architecture.
 
 UIGen consists of three main engines:
 
