@@ -21,6 +21,7 @@ from mcp.server.fastmcp import FastMCP
 from prompt_engine.prompt_composer import PromptComposer
 from prompt_engine.prompt_component import PromptComponent
 
+
 class MCPFactory(BaseModel):
     """
     Factory for building and configuring a FastMCP server with dynamic generation prompts.

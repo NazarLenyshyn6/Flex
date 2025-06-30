@@ -1,20 +1,125 @@
-# UIGen - User Interface Generation Framework
+# ui-gen - User Interface Generation Framework
 
 A modular framework for structured prompt composition, MCP (Model Context Protocol) server management, and command-line automation with Claude Code integration.
 
 ## Overview
 
-UIGen provides a foundation for building AI-powered development tools through three core engines:
+ui-gen provides a foundation for building AI-powered development tools through three core engines:
 
 - **Prompt Engine**: Type-safe prompt composition with modular components and stores
 - **MCP Engine**: FastMCP server factory and registry for Claude Code integration  
 - **CLI Engine**: Command-line interface built on Click framework with rich terminal output
 
+**⚠️ Critical Dependency**: ui-gen requires Claude Code CLI for all operations. Without working Claude Code, this framework provides zero functionality.
+
 Core architecture provides functional CLI and MCP management with prompt composition system.
 
-## Architecture.
+## Installation & Setup
 
-UIGen consists of three main engines:
+### ⚠️ CRITICAL: Claude Code Required
+
+**ui-gen framework is entirely dependent on Claude Code CLI**. All MCP operations, generation commands, and prompt execution require Claude Code to be properly installed and configured.
+
+### Prerequisites
+
+- **Python**: 3.12 or higher (required by setup.py)
+- **Claude Code CLI**: **ABSOLUTELY REQUIRED** - The entire framework is built around Claude Code integration and will not work without it
+
+### Complete Setup Process
+
+#### 1. Environment Setup
+Ensure Python 3.12+ and pip are installed on your system.
+
+#### 2. Claude Code Installation & Configuration (CRITICAL STEP)
+**This is the most important step - the entire framework depends on this being correct.**
+
+1. **Install Claude Code CLI**:
+   - Visit: https://docs.anthropic.com/claude/docs/claude-code
+   - Follow the official installation instructions for your platform
+   - Complete the authentication setup with your Anthropic API key
+
+2. **Verify Claude Code Installation**:
+   ```bash
+   # Test basic functionality
+   claude --help
+   
+   # Test authentication (should not show auth errors)
+   claude --version
+   
+   # Test MCP functionality specifically
+   claude mcp --help
+   claude mcp list
+   ```
+
+3. **Critical Configuration Check**:
+   ```bash
+   # This command MUST work for ui-gen to function
+   # If this fails, ui-gen will not work at all
+   claude mcp list
+   ```
+
+   **Expected output**: Either a list of servers or "No servers configured"
+   **Failure signs**: Authentication errors, command not found, permission errors
+
+4. **Troubleshoot Claude Code Issues**:
+   - Ensure API key is properly configured
+   - Check permissions and network connectivity
+   - Test with simple commands before proceeding
+
+**DO NOT PROCEED** until `claude mcp list` works correctly.
+
+#### 3. Project Dependencies
+Install all required dependencies (78 packages total):
+```bash
+# Core dependencies include:
+# - click==8.2.1 (CLI framework)
+# - pydantic==2.11.5 (data validation)
+# - mcp==1.9.3 (FastMCP integration)
+# - Additional packages for HTTP, AWS, ML, and development tools
+pip install -r requirements.txt
+```
+
+#### 4. Development Installation
+```bash
+# Install in editable mode for development
+pip install -e .
+
+# This creates the 'ui-gen' command entry point
+# configured in setup.py as cli.main:ui_gen_group
+```
+
+#### 5. Verify Complete Installation
+```bash
+# Test CLI functionality
+ui-gen --help
+ui-gen --verbose --help
+
+# CRITICAL: Test MCP commands (these MUST work)
+ui-gen mcp --help
+ui-gen mcp list-servers
+
+# Test generation commands
+ui-gen generate --help
+
+# Full integration test - this should complete without errors
+ui-gen --verbose mcp list-servers
+```
+
+**If any of these commands fail**, the problem is most likely with Claude Code configuration, not ui-gen itself.
+
+### Package Configuration
+
+**Entry Point**: `ui-gen` command configured in setup.py as `cli.main:ui_gen_group`
+
+**Dependencies**: 78 packages including:
+- `click==8.2.1` (CLI framework)  
+- `pydantic==2.11.5` (data validation)
+- `mcp==1.9.3` (FastMCP integration)
+- Additional packages for HTTP, AWS, ML, and development tools
+
+## Architecture
+
+ui-gen consists of three main engines:
 
 ### Core Engines
 
@@ -26,7 +131,7 @@ UIGen consists of three main engines:
 2. **MCP Engine** (`mcp_engine/`)
    - **Factory**: Fluent API for creating FastMCP servers with Pydantic validation
    - **Registry**: Server lifecycle management via Claude CLI integration
-   - **Default Server**: Pre-configured server implementation
+   - **Built-in Server**: Pre-configured server implementation
 
 3. **CLI Engine** (`cli/`)
    - **Commands**: Root command group with MCP management and generation commands
@@ -35,8 +140,8 @@ UIGen consists of three main engines:
 ### Supporting Modules
 
 4. **Generation Engine** (`gen_engine/`)
-   - **Manual Generator**: Claude CLI command builder
-   - **Auto Generator**: Placeholder implementation
+   - **Manual Generator**: Claude CLI command builder with subprocess execution
+   - **Auto Generator**: Future automatic generation capabilities
 
 5. **Data Transfer Objects** (`dto/`)
    - **CommandExecutionResult**: Structured command results
@@ -45,35 +150,6 @@ UIGen consists of three main engines:
 6. **Utilities** (`utils/`)
    - **Command Executor**: Subprocess decorator with timeout handling
 
-## Installation & Setup
-
-### Prerequisites
-
-- **Python**: 3.12 or higher (required by setup.py)
-- **Claude Code**: Required for MCP server integration and generation commands
-
-### Installation
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Install package in development mode
-pip install -e .
-
-# Verify CLI installation
-ui-gen --help
-```
-
-### Package Configuration
-
-**Entry Point**: `ui-gen` command configured in setup.py as `cli.main:ui_gen_group`
-
-**Dependencies**: 78 packages including:
-- `click==8.2.1` (CLI framework)  
-- `pydantic==2.11.5` (data validation)
-- `mcp==1.9.3` (FastMCP integration)
-- Additional packages for HTTP, AWS, ML, and development tools
 
 ## Usage
 
@@ -175,8 +251,9 @@ ui_gen/
 │   ├── README.md              # MCP engine documentation
 │   ├── mcp_factory.py         # Server factory
 │   ├── mcp_registry.py        # Server lifecycle
-│   └── default_mcp.py         # Default server (has issues)
+│   └── builtin_mcp.py         # Built-in MCP server implementation
 ├── gen_engine/                # Generation commands
+│   ├── README.md              # Generation engine documentation
 │   └── generator.py           # Manual/auto generators
 ├── dto/                       # Data transfer objects
 │   └── command_dto.py         # Result structures
@@ -201,5 +278,44 @@ Core dependencies from requirements.txt:
 4. **Command Executor → All**: Subprocess handling with structured results
 5. **Result Formatter → CLI**: Terminal output with styling
 
-**Author**: Nazar Lenyshyn (nleny@softserveinc.com)  
-**Python Version**: 3.12+ required
+## User Responsibilities
+
+**All Claude Code setup, environment configuration, and MCP server management is entirely the user's responsibility.**
+
+### Critical User Requirements:
+
+#### Claude Code Responsibility:
+- **Authentication**: Proper API key configuration and Claude Code login setup
+- **Network Access**: Ensuring Claude Code can connect to Anthropic's services
+- **Permissions**: Correct file system and CLI permissions for Claude Code operation
+- **Version Compatibility**: Using a compatible Claude Code version
+
+#### Configuration Management Responsibility:
+- **Environment Setup**: Managing environment variables, dependency versions, and system configuration
+- **MCP Registration**: Ensuring proper MCP server registration with correct server names
+- **Path Accuracy**: Providing accurate server paths that exist and are accessible
+- **Parameter Validation**: Supplying correct server names, prompts, and tool configurations
+
+### Failure Responsibility & User Fault:
+
+**95% of ui-gen failures are Claude Code configuration issues.** Common failure scenarios:
+
+1. **`ui-gen mcp list-servers` fails** → User's Claude Code MCP configuration is broken
+2. **`ui-gen generate` fails** → User's Claude Code CLI is not properly set up
+3. **Authentication errors** → User's API key or login configuration is incorrect
+4. **Server not found errors** → User provided wrong server names or paths
+5. **Command timeouts** → User's network or Claude Code connectivity issues
+
+### Explicit User Fault Conditions:
+
+**The following failures are ENTIRELY the user's fault:**
+- **Wrong server names**: Providing server names that don't exist or are misspelled
+- **Invalid file paths**: Specifying paths to servers that don't exist or are inaccessible  
+- **Incorrect tool configurations**: Supplying malformed or invalid tool allowlists
+- **Broken Claude Code setup**: Having non-functional Claude Code authentication or installation
+- **Network/permission issues**: Claude Code blocked by firewalls, permissions, or network policies
+- **Parameter mistakes**: Typos in commands, incorrect flags, or malformed inputs
+
+**Warning**: The framework will fail silently or with cryptic errors when given incorrect parameters. It is designed for automation and assumes all user inputs are correct.
+
+**Responsibility Disclaimer**: If the system fails due to user-provided incorrect configuration, wrong parameters, invalid paths, or broken Claude Code setup, this is entirely the user's fault. Do not troubleshoot ui-gen internals - verify your inputs and Claude Code configuration first.

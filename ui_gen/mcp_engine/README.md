@@ -37,7 +37,7 @@ Command execution system for managing MCP servers via Claude Code CLI:
 - `remove_mcp_server(server_name)`: Removes a registered MCP server  
 - `list_mcp_servers()`: Lists all registered MCP servers
 
-#### 3. **Default Server** (`default_mcp.py`)
+#### 3. **Built-in Server** (`builtin_mcp.py`)
 Pre-configured server implementation:
 
 - **Pre-configured Setup**: Out-of-the-box server with UI generation focus
@@ -117,11 +117,11 @@ servers_result = list_mcp_servers()
 removal_result = remove_mcp_server("my_prompt_server")
 ```
 
-### Default Server
+### Built-in Server
 
 ```python
-# Run the default server
-python -m mcp_engine.default_mcp
+# Run the built-in server
+python -m mcp_engine.builtin_mcp
 
 # Or create a custom server
 from mcp_engine.mcp_factory import MCPFactory
@@ -259,7 +259,7 @@ mcp_engine/
 ├── __init__.py                 # Package initialization (empty)
 ├── mcp_factory.py             # FastMCP server factory with fluent API
 ├── mcp_registry.py            # MCP server management via Claude Code CLI
-├── default_mcp.py             # Pre-configured default server
+├── builtin_mcp.py             # Pre-configured built-in server
 └── README.md                  # This documentation
 ```
 

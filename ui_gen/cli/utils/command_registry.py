@@ -19,14 +19,6 @@ def register_to_group(parent_group: click.Group) -> Callable[[ClickCommandOrGrou
     (e.g., @click.command() or @click.group()) to automatically add the decorated
     command or group to the given parent group.
 
-    Example usage:
-
-        @register_to_group(parent_group)
-        @click.command()
-        def cmd():
-            \"\"\"Command description.\"\"\"
-            ...
-
     Args:
         parent_group: The parent Click group instance to which the
                       decorated command or group will be added.

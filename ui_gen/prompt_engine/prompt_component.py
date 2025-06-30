@@ -6,6 +6,7 @@ to the formation of structured and configurable prompts.
 These enums allow for a strongly typed, explicit prompt configuration experience.
 """
 
+
 from enum import Enum, auto
 
 

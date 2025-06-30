@@ -5,17 +5,20 @@ It provides manual and automatic generation utilities, where each function const
 a command suitable for interactive or automated invocation via Claude’s MCP interface.
 
 Functions:
-- manual_generator: Constructs and executes a manual Claude command using user and server prompts.
-- auto_generator: Placeholder for future implementation of automatic prompt generation.
+- manual_generator: Allows manual control over Claude Code generation using explicit user and server prompts.
+- auto_generator: Placeholder for future implementation of automatic  generation.
 """
 
 
 from typing import List
 
+from pydantic import validate_call
+
 from utils.command_executor import subprocess_command_executor
 
 
 @subprocess_command_executor(capture_output=False)
+@validate_call()
 def manual_generator(server_name: str, 
                      server_prompt: str, 
                      user_prompt: str,
@@ -26,7 +29,7 @@ def manual_generator(server_name: str,
 
     Args:
         server_name: Name of the MCP server to target.
-        server_prompt: The system-level prompt that guides Claude's behavior.
+        server_prompt: Name of  system-level prompt that guides Claude's behavior.
         user_prompt: The actual prompt provided by the end user.
         allowed_tools: A string of tool names or identifiers Claude is allowed to use.
 
@@ -34,15 +37,9 @@ def manual_generator(server_name: str,
         list[str]: The full CLI command to execute via Claude.
     """
     prompt = f"/{server_name}:{server_prompt} (MCP) {user_prompt}"
-    return ["claude", prompt, allowed_tools]
+    return ["claude", prompt, "--allowedTools", allowed_tools]
 
 
 def auto_generator():
-    """
-    Constructs a Claude CLI command for automatically generating a prompt.
-
-    This function is a placeholder for future implementation of prompt auto-generation logic.
-
-    Returns:
-        TBD
-    """
+    """ ... """
+    ...

@@ -32,22 +32,17 @@ ClickColor = Literal[
 @dataclass(frozen=True)
 class CommandExecutionResult:
     """
-    Represents the result of executing an MCP command via the `claude` CLI.
-
-    This data structure is used to standardize output from the `@execute_command` decorator,
-    which wraps functions that generate MCP CLI commands. It encapsulates the success status,
-    the executed command, and any captured standard output or error messages.
+    Data structure designed to standardize the handling of subprocess results 
+    within the ui-gen framework. It captures key execution metadata in a consistent, 
+    testable, and serializable format for downstream reporting and debugging.
 
     Attributes:
         success: "True" if the command executed successfully (exit code 0), "False" otherwise.
         command: The exact command that was attempted (e.g., 'claude mcp list').
         output: Captured standard output from the command, if any.
         error: Captured standard error from the command, or exception message if failed.
-
-    Note:
-        This class is immutable (`frozen=True`) and intended for structured reporting
-        of MCP command executions, not for general subprocess handling.
     """
+    
     success: str
     command: str
     output: str

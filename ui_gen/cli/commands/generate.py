@@ -6,6 +6,7 @@ It registers the `generate` command to the root CLI group using a custom
 `@register_to_group` decorator and routes execution to appropriate generator logic.
 """
 
+
 import click
 
 from cli.commands.root import ui_gen_group
@@ -21,17 +22,20 @@ from gen_engine.generator import manual_generator
     type=click.Choice(["manual", "auto"], case_sensitive=False), 
     default="manual", 
     prompt="Generation mode",
-    help="Generation mode: 'manual' for explicit prompt construction, 'auto' (TBD) for intelligent generation."
+    help="""
+    Generation mode: 'manual' for explicit control over the Claude Code generation process, 
+    'auto' for automated prompt generation (under development).
+    """
 )
 @click.option(
     "--server-name", 
     prompt="Server name",
-    help="Name of the MCP server to invoke via Claude CLI."
+    help="MCP server name used to locate the predefined prompt for system-level instruction for the Claude agent."
 )
 @click.option(
     "--server-prompt", 
     prompt="Server prompt",
-    help="System-level instruction or behavior modifier for the Claude agent."
+    help="Predefined prompt name used as a system-level instruction for the Claude agent."
 )
 @click.option(
     "--user-prompt", 
@@ -54,13 +58,14 @@ def generate(ctx,
              allowed_tools):
     """
     \b
-    CLI entrypoint for generating user interfaces via Claude Code.
+    Generate user interfaces via Claude Code.
 
-    Depending on the selected mode, this command constructs a structured generation
-    request and invokes the appropriate generator. In 'manual' mode, the user provides 
-    the full prompt context. In 'auto' mode (not yet implemented), generation will be inferred.
-    
-    Command result is formatted using `ResultFormatter` with verbosity determined by context.
+    Depending on the selected mode, this command builds a structured generation
+    request and invokes the corresponding generator. In 'manual' mode, the user 
+    has full control over the Claude Code generation process. In 'auto' mode 
+    (currently not implemented), the entire generation workflow will be automated.
+
+    Command output is formatted using `ResultFormatter`, with verbosity controlled by the CLI context.
     """
     if mode == "manual":
         result = manual_generator(

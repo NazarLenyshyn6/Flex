@@ -19,11 +19,11 @@ Command builder for manual prompt generation:
 - **Type Safety**: Full type hints and parameter validation
 
 #### 2. **Auto Generator** (`generator.py`)
-Automatic prompt generation system:
+Future automatic prompt generation system:
 
-- **Intelligent Generation**: Automatic prompt generation capabilities
-- **Smart Defaults**: Intelligent selection of appropriate tools and settings
-- **Context Awareness**: Considers generation context for optimal results
+- **Placeholder Implementation**: Currently under development
+- **Future Capabilities**: Will provide intelligent automatic generation
+- **Planned Features**: Smart defaults and context-aware generation
 
 ## Implementation
 
@@ -32,6 +32,7 @@ Automatic prompt generation system:
 #### `manual_generator()`
 ```python
 @subprocess_command_executor(capture_output=False)
+@validate_call()
 def manual_generator(server_name: str, 
                      server_prompt: str, 
                      user_prompt: str,
@@ -41,31 +42,31 @@ def manual_generator(server_name: str,
     Constructs a Claude CLI command for manually invoking a server prompt with tool constraints.
     """
     prompt = f"/{server_name}:{server_prompt} (MCP) {user_prompt}"
-    return ["claude", prompt, allowed_tools]
+    return ["claude", prompt, "--allowedTools", allowed_tools]
 ```
 
 **Features**:
-- Proper command construction for Claude CLI
+- Proper command construction for Claude CLI with `--allowedTools` flag
 - MCP server integration with `/server_name:prompt` format
 - Tool allowlist support for agent safety
 - Subprocess execution with timeout handling
+- Pydantic validation with `@validate_call()` decorator
 - Error handling and result formatting
 
 #### `auto_generator()`
 ```python
 def auto_generator():
     """
-    Constructs a Claude CLI command for automatically generating a prompt.
+    Placeholder for future automatic prompt generation.
     
-    Provides intelligent prompt auto-generation capabilities.
-    
-    Returns:
-        CommandExecutionResult
+    Currently under development - will provide intelligent 
+    auto-generation capabilities.
     """
+    ...
 ```
 
-**Features**:
-- Automatic prompt generation logic
+**Planned Features**:
+- Automatic prompt generation logic (under development)
 - Intelligent tool and setting selection
 - Context-aware generation optimization
 
@@ -115,12 +116,12 @@ def generate_ui():
 
 The manual generator constructs commands in this format:
 ```bash
-claude "/server_name:prompt_text (MCP) user_input" "tool1,tool2,tool3"
+claude "/server_name:prompt_text (MCP) user_input" --allowedTools "tool1,tool2,tool3"
 ```
 
 **Example**:
 ```bash
-claude "/ui_gen:Generate React component (MCP) Create login form" "Bash,Edit,Read,Write"
+claude "/ui_gen:Generate React component (MCP) Create login form" --allowedTools "Bash,Edit,Read,Write"
 ```
 
 ### Tool Allowlist Format
@@ -228,16 +229,6 @@ gen_engine/
 ## Dependencies
 
 - **typing**: Type annotations (`List[str]`)
+- **pydantic**: Data validation with `validate_call` decorator
 - **utils.command_executor**: Subprocess execution decorator
 - **CLI Integration**: Used by `cli.commands.generate`
-
-## Architecture Features
-
-### Auto Generator Capabilities
-1. **Intelligent Prompt Analysis**: Parse user input for intent and context
-2. **Context Awareness**: Consider previous generations and learned patterns
-3. **Component Selection**: Automatic selection of appropriate prompt components
-4. **Tool Optimization**: Dynamic tool selection based on generation requirements
-
-**Author**: Part of UIGen framework  
-**Status**: Full generation capabilities with manual and automatic modes

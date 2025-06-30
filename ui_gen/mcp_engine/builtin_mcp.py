@@ -21,6 +21,8 @@ from prompt_engine.prompt_component import (
     OutputControlComponent, 
     )
 
+
+
 # Construct and configure the FastMCP server
 mcp: FastMCP = (MCPFactory()
                 .add_frontend_generation_prompt(
@@ -29,12 +31,13 @@ mcp: FastMCP = (MCPFactory()
                     prompt_components=[
                         TaskContextComponent.UI_GENERATION,
                         ModalityComponent.IMAGE_TEXT,
-                        TechConstraintComponent.FASTAPI,
+                        TechConstraintComponent.NEXTJS,
                         OutputControlComponent.STRICT_COMPLIANCE
                         ]
                     )
                 .get_mcp_server()
                 )
+
 
 if __name__ == "__main__":
     mcp.run()

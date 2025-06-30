@@ -88,18 +88,6 @@ Application bootstrap and entry point:
 
 ## Usage
 
-### Installation and Setup
-
-```bash
-# Install dependencies
-pip install click pydantic
-
-# Run the CLI
-python -m cli.main
-
-# Or directly execute
-python cli/main.py
-```
 
 ### Basic Commands
 
@@ -155,11 +143,11 @@ Bash,Edit,Replace,Bash(docker*),url,Bash(ls),Bash(cp),Bash(npm),Bash(next),Read,
 ```
 
 **Generate Command Parameters:**
-- `--mode`: Generation mode (`manual` or `auto`)
-- `--server-name`: MCP server identifier
-- `--server-prompt`: System-level instruction for Claude
-- `--user-prompt`: User input prompt (can be empty)
-- `--allowed-tools`: Comma-separated tool allowlist
+- `--mode`: Generation mode (`manual` or `auto`) - defaults to `manual` if not specified
+- `--server-name`: MCP server identifier - required, will prompt if not provided
+- `--server-prompt`: System-level instruction for Claude - required, will prompt if not provided  
+- `--user-prompt`: User input prompt - optional, will prompt with empty default
+- `--allowed-tools`: Comma-separated tool allowlist - defaults to predefined list if not specified
 
 ## Advanced Usage
 
@@ -447,15 +435,6 @@ cli/
     ├── command_registry.py   # Decorator-based command registration
     └── result_formatter.py   # Terminal output formatting system
 ```
-
-## Dependencies
-
-- **Click**: Modern command-line interface framework
-- **Pydantic**: Data validation and settings management
-- **Dataclasses**: Structured data objects for configuration
-- **Typing**: Type annotations and validation
-- **MCP Engine**: Integration with MCP server management
-- **Prompt Engine**: Integration with structured prompt composition
 
 ## Integration Patterns
 

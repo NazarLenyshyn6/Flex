@@ -19,11 +19,6 @@ Enumeration-based system for defining prompt component types:
 - **Tech Constraints**: Technical or architectural constraints for output
 - **Output Control**: Final controlling layer with strict compliance rules
 
-**Component Types:**
-- `TaskContextComponent.UI_GENERATION`: UI generation task context
-- `ModalityComponent.IMAGE_TEXT`, `IMAGE`, `TEXT`: Input modality specifications
-- `TechConstraintComponent.NEXTJS`, `FASTAPI`: Technical constraints
-- `OutputControlComponent.STRICT_COMPLIANCE`: Output compliance rules
 
 #### 2. **PromptStore** (`prompt_store.py`)
 Abstract base class for managing frontend and backend prompt strings:
@@ -299,23 +294,6 @@ prompt_engine/
 │   └── output_control_store.py # Output control and compliance prompts
 └── README.md                  # This documentation
 ```
-
-## Registered Prompts
-
-### TaskContextStore
-- `UI_GENERATION`: Supports UI generation task context
-
-### ModalityStore
-- `IMAGE_TEXT`: Handles combined image and text input modalities
-- `IMAGE`: Supports image-only input processing
-- `TEXT`: Manages text-based input processing
-
-### TechConstraintStore
-- `NEXTJS`: Provides Next.js technical constraints
-- `FASTAPI`: Supports FastAPI framework constraints
-
-### OutputControlStore
-- `STRICT_COMPLIANCE`: Enforces strict output compliance rules
 
 ## Dependencies
 

@@ -31,14 +31,14 @@ def subprocess_command_executor(capture_output: bool, timeout: Optional[int] = N
     Parameters:
         capture_output: Whether to capture and return stdout output from the command.
         timeout: Optional timeout in seconds for the subprocess execution.
-
-    Raises:
-        - Returns error information in `CommandExecutionResult` if the `claude` binary is missing.
-        - Handles subprocess timeout and general exceptions gracefully.
         
     Returns:
         Callable: A decorator that wraps a function generating a CLI command (as list[str]) 
                   and returns a `CommandExecutionResult` upon execution.
+
+    Raises:
+        - Returns error information in `CommandExecutionResult` if the `claude` binary is missing.
+        - Handles subprocess timeout and general exceptions gracefully.
     """
     def decorator(func: Callable[P, Sequence[str]]) -> Callable[P, Optional[CommandExecutionResult]]:
         @wraps(func)

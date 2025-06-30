@@ -14,10 +14,13 @@ Functions:
 
 from pathlib import Path
 
+from pydantic import validate_call
+
 from utils.command_executor import subprocess_command_executor
 
 
 @subprocess_command_executor(capture_output=True)
+@validate_call()
 def add_mcp_server(
     server_name: str, 
     server_path: str
@@ -29,11 +32,11 @@ def add_mcp_server(
         server_name: The identifier to assign to the MCP server.
         server_path: Path to the Python file that launches the server.
         
-    Raises:
-        FileNotFoundError: If the given server_path does not exist.
-        
     Returns:
         list[str]: CLI command to register the MCP server.
+        
+    Raises:
+        FileNotFoundError: If the given server_path does not exist.
     """
     if not Path(server_path).exists():
         raise FileNotFoundError(f"Cannot register server: path does not exist → '{server_path}'")
@@ -41,6 +44,7 @@ def add_mcp_server(
     
     
 @subprocess_command_executor(capture_output=True)
+@validate_call()
 def remove_mcp_server(server_name: str):
     """
     Constructs a CLI command to remove an MCP server from Claude Code.
