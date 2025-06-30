@@ -54,18 +54,6 @@ The MCP Engine implements an **abstraction-first approach** where high-level ser
 - Demonstrates `MCPFactory` fluent API usage
 - Serves as template for custom server implementations
 
-### 4. **Powerful Built-in MCP Server** (`powerful_builtin_mcp.py`) - **Enterprise Implementation**
-
-**Core Abstraction**: Comprehensive server showcasing full framework capabilities
-- **Interface Utilization**: Extensive use of `MCPFactory` with multiple prompt component combinations
-- **Abstraction Leverage**: Demonstrates composition of various `PromptComponent` types for specialized use cases
-- **Scalability Pattern**: Shows how abstraction layer supports complex server configurations
-
-**Architecture Demonstration**:
-- **16 specialized prompts**: Each using different `PromptComponent` combinations
-- **Multi-modal support**: `ModalityComponent.IMAGE_TEXT`, `ModalityComponent.SKETCH`, etc.
-- **Technology constraints**: Various `TechConstraintComponent` configurations
-- **Output control**: Different `OutputControlComponent` and `RefinementComponent` combinations
 
 ## Architectural Benefits
 
@@ -153,8 +141,6 @@ removal_result = remove_mcp_server("my_prompt_server")
 # Run the basic built-in server
 python -m mcp_engine.builtin_mcp
 
-# Run the powerful enterprise server (recommended)
-python -m mcp_engine.powerful_builtin_mcp
 
 # Or create a custom server
 from mcp_engine.mcp_factory import MCPFactory
@@ -285,39 +271,6 @@ server = (MCPFactory()
 ```
 
 
-## Powerful Built-in Server
-
-The enterprise-grade server (`powerful_builtin_mcp.py`) provides 16 specialized prompts for comprehensive UI development:
-
-### Available Prompts
-
-1. **screenshot_text_to_compiled_ui** - Multi-modal input (image + text) to compiled Next.js components
-2. **nextjs_image_to_component** - Generate components from UI screenshots
-3. **nextjs_sketch_to_component** - Convert wireframes to components
-4. **nextjs_spec_to_component** - Build from markdown specifications
-5. **nextjs_component_library** - Create reusable component libraries
-6. **nextjs_form_builder** - Generate dynamic forms from JSON schemas
-7. **nextjs_accessibility_audit** - WCAG compliance and accessibility fixes
-8. **nextjs_performance_optimizer** - Performance and bundle optimization
-9. **nextjs_responsive_enhancer** - Responsive design capabilities
-10. **nextjs_theme_generator** - Design systems and themes
-11. **nextjs_test_generator** - Comprehensive test suites
-12. **nextjs_error_boundary** - Robust error handling
-13. **nextjs_i18n_setup** - Internationalization setup
-14. **nextjs_migration_assistant** - Framework migration support
-15. **nextjs_doc_generator** - Documentation and Storybook stories
-16. **nextjs_automation_dashboard** - Admin panels and dashboards
-
-### Usage
-
-```python
-# Run the powerful server
-python -m mcp_engine.powerful_builtin_mcp
-
-# Or import programmatically
-from mcp_engine.powerful_builtin_mcp import mcp_server
-mcp_server.run()
-```
 
 ## File Structure
 
@@ -327,7 +280,6 @@ mcp_engine/
 ├── mcp_factory.py             # FastMCP server factory with fluent API
 ├── mcp_registry.py            # MCP server management via Claude Code CLI
 ├── builtin_mcp.py             # Basic pre-configured built-in server
-├── powerful_builtin_mcp.py    # Enterprise server with 16 specialized prompts
 └── README.md                  # This documentation
 ```
 

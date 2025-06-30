@@ -133,7 +133,6 @@ ui-gen implements a **dependency inversion architecture** with three core engine
    - **MCPFactory**: Builder pattern for FastMCP server configuration with fluent API
    - **MCP Registry**: Server lifecycle management through Claude Code CLI integration
    - **Built-in MCP Server**: Basic pre-configured server with essential UI generation capabilities
-   - **Powerful Built-in MCP Server**: Enterprise-grade server with 16 specialized generation prompts
 
 3. **CLI Engine** (`cli/`) - **Command Interface & Execution**
    - **Command Groups**: Hierarchical command structure with auto-registration
@@ -255,8 +254,7 @@ ui_gen/
 │   ├── README.md              # MCP engine documentation
 │   ├── mcp_factory.py         # Server factory
 │   ├── mcp_registry.py        # Server lifecycle
-│   ├── builtin_mcp.py         # Basic built-in MCP server
-│   └── powerful_builtin_mcp.py # Enterprise MCP server (16 prompts)
+│   └── builtin_mcp.py         # Basic built-in MCP server
 ├── gen_engine/                # Generation commands
 │   ├── README.md              # Generation engine documentation
 │   └── generator.py           # Manual/auto generators
