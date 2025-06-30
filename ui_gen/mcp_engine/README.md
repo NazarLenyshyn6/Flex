@@ -1,58 +1,88 @@
 # MCP Engine
 
-A factory system for building and managing FastMCP (Model Context Protocol) servers with integrated prompt generation capabilities.
+A **builder pattern factory system** implementing **dependency inversion principles** for FastMCP (Model Context Protocol) server construction and lifecycle management with type-safe prompt integration.
 
-## Overview
+## Architecture Overview
 
-The MCP Engine provides a toolkit for creating MCP servers that leverage the structured prompt system from the prompt_engine. It handles server configuration, command execution, and prompt registration with built-in validation and error handling.
+The MCP Engine implements an **abstraction-first approach** where high-level server construction depends on interfaces (`PromptComponent`, `PromptComposer`) rather than concrete implementations, enabling dynamic server configuration and extensible prompt systems.
 
-## Architecture
+## Core Abstractions
 
-### Core Components
+### 1. **MCPFactory** (`mcp_factory.py`) - **Builder Pattern with Dependency Inversion**
 
-#### 1. **MCPFactory** (`mcp_factory.py`)
-Factory pattern implementation for building and configuring FastMCP servers:
+**Core Abstraction**: Fluent API for FastMCP server construction
+- **Interface Contract**: Builder pattern depending on `PromptComponent` and `PromptComposer` abstractions
+- **Dependency Inversion**: Depends on prompt interfaces, not concrete prompt implementations
+- **Extension Points**: Configurable dependencies and pluggable prompt composition strategies
 
-- **Server Construction**: Initializes FastMCP instances with custom dependencies
-- **Prompt Integration**: Seamlessly integrates with PromptComposer for dynamic prompt assembly
-- **Fluent API**: Supports method chaining for clean configuration syntax
-- **Type Safety**: Full Pydantic validation for all inputs and configurations
-- **Dual Layer Support**: Supports both frontend and backend generation prompts
+**Key Interface Methods:**
+- `add_frontend_generation_prompt(name, description, prompt_components: List[PromptComponent])`: Leverages `PromptComposer` abstraction
+- `add_backend_generation_prompt(name, description, prompt_components: List[PromptComponent])`: Uses same abstraction layer
+- `get_mcp_server() -> FastMCP`: Returns configured server instance
 
-**Key Methods:**
-- `add_frontend_generation_prompt()`: Adds frontend-specific prompts using PromptComposer
-- `add_backend_generation_prompt()`: Adds backend-specific prompts using PromptComposer
-- `get_mcp_server()`: Returns the configured FastMCP instance
+**Abstraction Benefits**:
+- **Type Safety**: Pydantic validation with `PromptComponent` enum constraints
+- **Composability**: Dynamic server configuration through component assembly
+- **Extensibility**: New prompt types supported without factory changes
 
-#### 2. **MCP Registry** (`mcp_registry.py`)
-Command execution system for managing MCP servers via Claude Code CLI:
+### 2. **MCP Registry** (`mcp_registry.py`) - **Command Execution Abstraction**
 
-- **CLI Integration**: Built-in support for `claude mcp` commands
-- **Server Management**: Add, remove, and list MCP servers
-- **Path Validation**: Ensures server paths exist before registration
-- **Subprocess Execution**: Decorated functions for structured command execution
+**Core Abstraction**: Server lifecycle management through standardized command execution
+- **Interface Contract**: Functions decorated with `@subprocess_command_executor` for consistent execution patterns
+- **Dependency Inversion**: Depends on `CommandExecutionResult` abstraction, not specific execution implementations
+- **Extension Points**: Pluggable command execution with timeout and error handling
 
-**Key Functions:**
-- `add_mcp_server(server_name, server_path)`: Registers a new MCP server
-- `remove_mcp_server(server_name)`: Removes a registered MCP server  
-- `list_mcp_servers()`: Lists all registered MCP servers
+**Key Interface Functions:**
+- `add_mcp_server(server_name: str, server_path: str) -> CommandExecutionResult`: File system validation + Claude CLI integration
+- `remove_mcp_server(server_name: str) -> CommandExecutionResult`: Server deregistration with error handling
+- `list_mcp_servers() -> CommandExecutionResult`: Server enumeration with structured output
 
-#### 3. **Built-in Server** (`builtin_mcp.py`)
-Pre-configured server implementation:
+**Abstraction Benefits**:
+- **Consistent Interface**: All functions return `CommandExecutionResult` for uniform error handling
+- **Validation Layer**: Path existence validation before Claude CLI invocation
+- **Timeout Handling**: Configurable execution timeouts through decorator abstraction
 
-- **Pre-configured Setup**: Out-of-the-box server with UI generation focus
-- **Component Integration**: Uses TaskContext, Modality, TechConstraint, and OutputControl components
-- **Framework Support**: Configured for modern web development frameworks
+### 3. **Built-in MCP Server** (`builtin_mcp.py`) - **Basic Implementation**
 
-## Key Features
+**Core Abstraction**: Pre-configured server demonstrating `MCPFactory` usage patterns
+- **Interface Implementation**: Uses `MCPFactory` builder pattern with standard prompt components
+- **Dependency on Abstractions**: Leverages `PromptComponent` enums and `PromptComposer` for configuration
+- **Extension Example**: Shows how to create servers using the abstraction layer
 
-- **FastMCP Integration**: Native support for FastMCP server architecture
-- **Prompt Engine Bridge**: Integration with structured prompt composition
-- **Command Execution**: Subprocess decorator for MCP command handling
-- **Type Safety**: Full Pydantic validation throughout the system
-- **CLI Integration**: Built-in support for Claude Code CLI operations
-- **Fluent Configuration**: Method chaining for clean server setup
-- **Path Validation**: File existence checks before server registration
+**Configuration Pattern**:
+- Single frontend generation prompt using `TaskContextComponent.UI_GENERATION`
+- Demonstrates `MCPFactory` fluent API usage
+- Serves as template for custom server implementations
+
+### 4. **Powerful Built-in MCP Server** (`powerful_builtin_mcp.py`) - **Enterprise Implementation**
+
+**Core Abstraction**: Comprehensive server showcasing full framework capabilities
+- **Interface Utilization**: Extensive use of `MCPFactory` with multiple prompt component combinations
+- **Abstraction Leverage**: Demonstrates composition of various `PromptComponent` types for specialized use cases
+- **Scalability Pattern**: Shows how abstraction layer supports complex server configurations
+
+**Architecture Demonstration**:
+- **16 specialized prompts**: Each using different `PromptComponent` combinations
+- **Multi-modal support**: `ModalityComponent.IMAGE_TEXT`, `ModalityComponent.SKETCH`, etc.
+- **Technology constraints**: Various `TechConstraintComponent` configurations
+- **Output control**: Different `OutputControlComponent` and `RefinementComponent` combinations
+
+## Architectural Benefits
+
+**Dependency Inversion Implementation**:
+- **Factory Pattern**: `MCPFactory` depends on `PromptComponent` abstractions, not concrete component implementations
+- **Command Abstraction**: Registry functions depend on `CommandExecutionResult` interface, not specific execution mechanisms
+- **Composition Over Inheritance**: Server configuration through component composition rather than class hierarchies
+
+**Extension Points**:
+- **New Prompt Types**: Add new `PromptComponent` enums without modifying factory logic
+- **Custom Servers**: Implement servers using `MCPFactory` abstraction without understanding internal composition
+- **Execution Strategies**: Replace command execution implementation while maintaining `CommandExecutionResult` contract
+
+**Type Safety & Validation**:
+- **Compile-time Safety**: `PromptComponent` enum constraints prevent invalid configurations
+- **Runtime Validation**: Pydantic validation ensures proper server construction
+- **Interface Contracts**: Clear contracts between factory, registry, and execution layers
 
 ## Usage
 
@@ -74,7 +104,7 @@ mcp_server = (MCPFactory()
         description="Generates frontend UI from images",
         prompt_components=[
             TaskContextComponent.UI_GENERATION,
-            ModalityComponent.IMAGE_TEXT,
+            ModalityComponent.IMAGE,
             TechConstraintComponent.NEXTJS,
             OutputControlComponent.STRICT_COMPLIANCE
         ]
@@ -120,8 +150,11 @@ removal_result = remove_mcp_server("my_prompt_server")
 ### Built-in Server
 
 ```python
-# Run the built-in server
+# Run the basic built-in server
 python -m mcp_engine.builtin_mcp
+
+# Run the powerful enterprise server (recommended)
+python -m mcp_engine.powerful_builtin_mcp
 
 # Or create a custom server
 from mcp_engine.mcp_factory import MCPFactory
@@ -138,7 +171,7 @@ server = (MCPFactory()
         description="UI generation system",
         prompt_components=[
             TaskContextComponent.UI_GENERATION,
-            ModalityComponent.IMAGE_TEXT,
+            ModalityComponent.IMAGE,
             TechConstraintComponent.NEXTJS,
             OutputControlComponent.STRICT_COMPLIANCE
         ]
@@ -252,6 +285,40 @@ server = (MCPFactory()
 ```
 
 
+## Powerful Built-in Server
+
+The enterprise-grade server (`powerful_builtin_mcp.py`) provides 16 specialized prompts for comprehensive UI development:
+
+### Available Prompts
+
+1. **screenshot_text_to_compiled_ui** - Multi-modal input (image + text) to compiled Next.js components
+2. **nextjs_image_to_component** - Generate components from UI screenshots
+3. **nextjs_sketch_to_component** - Convert wireframes to components
+4. **nextjs_spec_to_component** - Build from markdown specifications
+5. **nextjs_component_library** - Create reusable component libraries
+6. **nextjs_form_builder** - Generate dynamic forms from JSON schemas
+7. **nextjs_accessibility_audit** - WCAG compliance and accessibility fixes
+8. **nextjs_performance_optimizer** - Performance and bundle optimization
+9. **nextjs_responsive_enhancer** - Responsive design capabilities
+10. **nextjs_theme_generator** - Design systems and themes
+11. **nextjs_test_generator** - Comprehensive test suites
+12. **nextjs_error_boundary** - Robust error handling
+13. **nextjs_i18n_setup** - Internationalization setup
+14. **nextjs_migration_assistant** - Framework migration support
+15. **nextjs_doc_generator** - Documentation and Storybook stories
+16. **nextjs_automation_dashboard** - Admin panels and dashboards
+
+### Usage
+
+```python
+# Run the powerful server
+python -m mcp_engine.powerful_builtin_mcp
+
+# Or import programmatically
+from mcp_engine.powerful_builtin_mcp import mcp_server
+mcp_server.run()
+```
+
 ## File Structure
 
 ```
@@ -259,7 +326,8 @@ mcp_engine/
 ├── __init__.py                 # Package initialization (empty)
 ├── mcp_factory.py             # FastMCP server factory with fluent API
 ├── mcp_registry.py            # MCP server management via Claude Code CLI
-├── builtin_mcp.py             # Pre-configured built-in server
+├── builtin_mcp.py             # Basic pre-configured built-in server
+├── powerful_builtin_mcp.py    # Enterprise server with 16 specialized prompts
 └── README.md                  # This documentation
 ```
 

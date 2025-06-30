@@ -22,12 +22,14 @@ from prompt_engine.prompt_stores.task_context_store import TaskContextStore
 from prompt_engine.prompt_stores.modality_store import ModalityStore
 from prompt_engine.prompt_stores.tech_constraint_store import TechConstraintStore
 from prompt_engine.prompt_stores.output_control_store import OutputControlStore
+from prompt_engine.prompt_stores.refinement_store import RefinementStore
 from prompt_engine.prompt_component import (
     PromptComponent, 
     TaskContextComponent, 
     ModalityComponent, 
     TechConstraintComponent, 
-    OutputControlComponent
+    OutputControlComponent,
+    RefinementComponent
     )
 
 
@@ -222,4 +224,9 @@ PromptComposer.register_prompt_store(
 PromptComposer.register_prompt_store(
     prompt_component=OutputControlComponent,
     prompt_store=OutputControlStore
+    )
+
+PromptComposer.register_prompt_store(
+    prompt_component=RefinementComponent,
+    prompt_store=RefinementStore
     )

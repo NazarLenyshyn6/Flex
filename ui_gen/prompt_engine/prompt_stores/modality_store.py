@@ -43,12 +43,81 @@ class ModalityStore(PromptStore[ModalityComponent]):
                                                                 # Register Modality Prompts
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ModalityStore.register_frontend_prompt(
-    prompt_component=ModalityComponent.IMAGE_TEXT,
+    prompt_component=ModalityComponent.TEXT,
     frontend_prompt=
     """
-        ###  Input Assets
+    Process free-form text input as UI generation instructions. Parse natural language commands and descriptions to extract UI requirements.
+    Identify component types, layout specifications, styling preferences, and functional requirements from textual descriptions.
+    Convert text-based UI requests into structured component generation parameters.
+    """
+    )
 
-        * `UI/layout/`: Pixel-perfect reference images for all screens, modals, forms, and interaction states (hover, loading, error, empty, disabled, success). **You must match these exactly — no approximations allowed.**
-        * `UI/api_contract.md`: The **sole source of truth** describing all endpoints, request/response JSON schemas, payload types, status codes, and behaviors. **No guessing, inferring, or altering any behavior**.
+ModalityStore.register_frontend_prompt(
+    prompt_component=ModalityComponent.IMAGE,
+    frontend_prompt=
+    """
+    Analyze UI screenshots or rendered component images to understand visual structure and design patterns.
+    Extract layout information, component hierarchy, styling details, and visual relationships from images.
+    Generate code that recreates the visual appearance and structure shown in the provided UI images.
+    """
+    )
+
+ModalityStore.register_frontend_prompt(
+    prompt_component=ModalityComponent.SKETCH,
+    frontend_prompt=
+    """
+    Interpret hand-drawn sketches and whiteboard wireframes to understand intended UI layout and functionality.
+    Extract component placement, rough sizing, navigation flow, and interaction patterns from sketched designs.
+    Transform sketched concepts into functional UI components while preserving the intended design intent.
+    """
+    )
+
+ModalityStore.register_frontend_prompt(
+    prompt_component=ModalityComponent.MARKDOWN_SPEC,
+    frontend_prompt=
+    """
+    Parse structured markdown specifications to extract UI requirements and component definitions.
+    Process markdown-formatted documents containing feature specifications, component requirements, and design guidelines.
+    Convert markdown specifications into implementable UI components following the documented requirements.
+    """
+    )
+
+ModalityStore.register_frontend_prompt(
+    prompt_component=ModalityComponent.JSON_SCHEMA,
+    frontend_prompt=
+    """
+    Interpret JSON schemas and backend data models to generate appropriate UI components for data representation.
+    Analyze data structure, field types, validation rules, and relationships to create suitable form inputs and display components.
+    Generate UI components that properly handle the data types and constraints defined in the JSON schema.
+    """
+    )
+
+ModalityStore.register_frontend_prompt(
+    prompt_component=ModalityComponent.HTML,
+    frontend_prompt=
+    """
+    Process existing HTML markup for audit, analysis, or migration purposes.
+    Extract semantic structure, styling patterns, and component organization from HTML code.
+    Use HTML analysis to inform UI improvements, framework migrations, or component modernization.
+    """
+    )
+
+ModalityStore.register_frontend_prompt(
+    prompt_component=ModalityComponent.YAML_UI_CONFIG,
+    frontend_prompt=
+    """
+    Parse YAML configuration files that describe UI structure and component hierarchies.
+    Extract component definitions, layout specifications, and configuration parameters from YAML format.
+    Generate UI components based on the structured configuration data provided in YAML format.
+    """
+    )
+
+ModalityStore.register_frontend_prompt(
+    prompt_component=ModalityComponent.DSL_UI_LANG,
+    frontend_prompt=
+    """
+    Process domain-specific language expressions for UI generation from custom UI description languages.
+    Parse DSL syntax to understand component specifications, data bindings, and interaction patterns.
+    Convert DSL expressions into native UI components while preserving the specified behavior and structure.
     """
     )

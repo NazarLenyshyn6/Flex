@@ -119,36 +119,39 @@ ui-gen --verbose mcp list-servers
 
 ## Architecture
 
-ui-gen consists of three main engines:
+ui-gen implements a **dependency inversion architecture** with three core engines built on abstraction layers:
 
 ### Core Engines
 
-1. **Prompt Engine** (`prompt_engine/`)
-   - **Components**: Enum-based component system (`TaskContextComponent`, `ModalityComponent`, `TechConstraintComponent`, `OutputControlComponent`)
-   - **Stores**: Abstract base class with specialized implementations for each component type
-   - **Composer**: Dynamic prompt assembly engine with store registry
+1. **Prompt Engine** (`prompt_engine/`) - **Component-Based Prompt Assembly**
+   - **PromptComponent Interface**: Abstract enum base for type-safe component taxonomy
+   - **PromptStore<T> Abstraction**: Generic storage layer with frontend/backend separation
+   - **PromptComposer**: Registry-based assembly engine for dynamic prompt composition
+   - **Specialized Stores**: Type-specific implementations (`TaskContextStore`, `ModalityStore`, `TechConstraintStore`, `OutputControlStore`, `RefinementStore`)
 
-2. **MCP Engine** (`mcp_engine/`)
-   - **Factory**: Fluent API for creating FastMCP servers with Pydantic validation
-   - **Registry**: Server lifecycle management via Claude CLI integration
-   - **Built-in Server**: Pre-configured server implementation
+2. **MCP Engine** (`mcp_engine/`) - **Server Factory & Lifecycle Management**
+   - **MCPFactory**: Builder pattern for FastMCP server configuration with fluent API
+   - **MCP Registry**: Server lifecycle management through Claude Code CLI integration
+   - **Built-in MCP Server**: Basic pre-configured server with essential UI generation capabilities
+   - **Powerful Built-in MCP Server**: Enterprise-grade server with 16 specialized generation prompts
 
-3. **CLI Engine** (`cli/`)
-   - **Commands**: Root command group with MCP management and generation commands
-   - **Utils**: Auto-registration decorators and result formatters
+3. **CLI Engine** (`cli/`) - **Command Interface & Execution**
+   - **Command Groups**: Hierarchical command structure with auto-registration
+   - **Result Formatting**: Structured output with verbose/concise modes and terminal styling
+   - **Interactive Workflows**: Parameter prompting with validation and error handling
 
 ### Supporting Modules
 
-4. **Generation Engine** (`gen_engine/`)
-   - **Manual Generator**: Claude CLI command builder with subprocess execution
-   - **Auto Generator**: Future automatic generation capabilities
+4. **Generation Engine** (`gen_engine/`) - **Command Generation & Execution**
+   - **Manual Generator**: Claude CLI command builder with MCP server integration and tool restrictions
+   - **Auto Generator**: Placeholder for future intelligent generation capabilities
 
-5. **Data Transfer Objects** (`dto/`)
-   - **CommandExecutionResult**: Structured command results
-   - **ResultStyle**: Terminal formatting configuration
+5. **Data Transfer Objects** (`dto/`) - **Structured Communication**
+   - **CommandExecutionResult**: Immutable result wrapper for standardized subprocess output
+   - **ResultStyle**: Terminal styling configuration with color and formatting options
 
-6. **Utilities** (`utils/`)
-   - **Command Executor**: Subprocess decorator with timeout handling
+6. **Utilities** (`utils/`) - **Infrastructure Services**
+   - **subprocess_command_executor**: Decorator pattern for timeout-aware command execution with structured error handling
 
 
 ## Usage
@@ -178,7 +181,8 @@ from prompt_engine.prompt_component import (
     TaskContextComponent,
     ModalityComponent,
     TechConstraintComponent,
-    OutputControlComponent
+    OutputControlComponent,
+    RefinementComponent
 )
 
 # Compose prompts with registered components
@@ -251,7 +255,8 @@ ui_gen/
 │   ├── README.md              # MCP engine documentation
 │   ├── mcp_factory.py         # Server factory
 │   ├── mcp_registry.py        # Server lifecycle
-│   └── builtin_mcp.py         # Built-in MCP server implementation
+│   ├── builtin_mcp.py         # Basic built-in MCP server
+│   └── powerful_builtin_mcp.py # Enterprise MCP server (16 prompts)
 ├── gen_engine/                # Generation commands
 │   ├── README.md              # Generation engine documentation
 │   └── generator.py           # Manual/auto generators
@@ -272,11 +277,13 @@ Core dependencies from requirements.txt:
 
 ## Integration Points
 
-1. **CLI → MCP Engine**: Server management via `mcp_registry` functions
-2. **CLI → Generation Engine**: Command building via `generator` functions  
-3. **MCP Factory → Prompt Engine**: Server creation with prompt components
-4. **Command Executor → All**: Subprocess handling with structured results
-5. **Result Formatter → CLI**: Terminal output with styling
+The architecture demonstrates **dependency inversion** through these abstraction-based integrations:
+
+1. **CLI → MCP Engine**: Command layer depends on `MCPFactory` and registry abstractions, not concrete implementations
+2. **CLI → Generation Engine**: Interface layer uses `subprocess_command_executor` abstraction for consistent execution patterns
+3. **MCP Factory → Prompt Engine**: Builder depends on `PromptComponent` and `PromptComposer` interfaces, enabling dynamic server configuration
+4. **Prompt Composer → Prompt Stores**: Assembly engine depends on `PromptStore<T>` abstraction, not specific store implementations
+5. **All Modules → Command Execution**: Standardized through `CommandExecutionResult` contract and decorator pattern
 
 ## User Responsibilities
 

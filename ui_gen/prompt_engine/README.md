@@ -1,69 +1,129 @@
 # Prompt Engine
 
-A modular prompt composition system for building dynamic, structured prompts with type-safe component architecture for code generation tasks.
+A **component-based composition system** implementing **dependency inversion principles** for type-safe, modular prompt assembly with extensible architecture and strong abstraction layers.
 
-## Overview
+## Architecture Overview  
 
-The Prompt Engine provides a toolkit for creating modular, composable prompt systems. It uses a strongly-typed architecture with component-based prompt assembly, allowing for flexible and reusable prompt configurations.
+The Prompt Engine implements **interface-driven design** where the composition engine (`PromptComposer`) depends on component abstractions (`PromptComponent`) and storage interfaces (`PromptStore<T>`), enabling dynamic prompt assembly without tight coupling to specific implementations.
 
-## Architecture
+## Core Abstractions
 
-### Core Components
+### 1. **PromptComponent** (`prompt_component.py`) - **Type-Safe Component Taxonomy**
 
-#### 1. **PromptComponent** (`prompt_component.py`)
-Enumeration-based system for defining prompt component types:
+**Core Abstraction**: Enumeration-based interface hierarchy for prompt component classification
+- **Interface Contract**: Base enum serving as marker interface for all prompt component types
+- **Dependency Inversion**: All components depend on abstract `PromptComponent` base, not concrete implementations
+- **Extension Points**: New component categories via enum inheritance without breaking existing code
 
-- **Base Interface**: Common marker interface for all prompt components
-- **Task Context**: High-level task or problem context specification
-- **Modality**: Input data interpretation and parsing specifications
-- **Tech Constraints**: Technical or architectural constraints for output
-- **Output Control**: Final controlling layer with strict compliance rules
+**Component Hierarchy**:
+- **`PromptComponent`**: Abstract base enum establishing the component contract
+- **`TaskContextComponent`**: WHAT to generate (UI generation, bug fixes, themes, etc.)
+- **`ModalityComponent`**: HOW input is provided (text, image, sketch, JSON schema, etc.)
+- **`TechConstraintComponent`**: WHICH technologies to use (React, Vue, Tailwind, TypeScript, etc.)
+- **`OutputControlComponent`**: HOW to format output (compliance, comments, testing, etc.)
+- **`RefinementComponent`**: WHAT improvements to apply (accessibility, layout, performance, etc.)
+
+**Abstraction Benefits**:
+- **Type Safety**: Compile-time validation prevents invalid component combinations
+- **Extensibility**: New component types added without modifying composition logic
+- **Interface Segregation**: Each component category has focused, single-responsibility interface
 
 
-#### 2. **PromptStore** (`prompt_store.py`)
-Abstract base class for managing frontend and backend prompt strings:
+### 2. **PromptStore<T>** (`prompt_store.py`) - **Generic Storage Abstraction**
 
-- **Type Safety**: Generic implementation with prompt component validation
-- **Dual Storage**: Separate frontend and backend prompt registries
-- **CRUD Operations**: Registration, retrieval, and removal of prompts
-- **Subclass Enforcement**: Ensures proper store implementation via ABC mechanisms
+**Core Abstraction**: Generic abstract base class for type-safe prompt storage
+- **Interface Contract**: Abstract methods defining CRUD operations with type parameter constraints
+- **Dependency Inversion**: Stores depend on `PromptComponent` abstraction, not specific component types
+- **Extension Points**: Subclasses implement `prompt_component()` method to specify their managed component type
 
-**Key Methods:**
-- `register_frontend_prompt()`: Registers frontend-specific prompts
-- `register_backend_prompt()`: Registers backend-specific prompts
-- `get_frontend_prompt()`: Retrieves frontend prompts with validation
-- `get_backend_prompt()`: Retrieves backend prompts with validation
+**Generic Interface Definition**:
+```python
+class PromptStore(ABC, Generic[T]):
+    @classmethod
+    @abstractmethod
+    def prompt_component(cls) -> Type[PromptComponent]:
+        """Contract: subclasses must declare their managed component type"""
+    
+    # CRUD interface with type safety
+    @classmethod
+    def get_frontend_prompt(cls, prompt_component: T) -> str
+    @classmethod
+    def register_frontend_prompt(cls, prompt_component: T, prompt: str) -> None
+```
 
-#### 3. **PromptComposer** (`prompt_composer.py`)
-Dynamic prompt assembly engine with modular architecture:
+**Abstraction Benefits**:
+- **Type Parameter Constraints**: Generic `T` ensures store implementations are type-safe
+- **Interface Enforcement**: ABC pattern requires implementation of core methods
+- **Dual Target Support**: Separate frontend/backend prompt storage with consistent interface
+- **Validation Layer**: Component type validation at both registration and retrieval
 
-- **Component Aggregation**: Combines individual prompt components into complete prompts
-- **Store Registry**: Manages registration and retrieval of specialized prompt stores
-- **Validation System**: Type checking for components and stores
-- **Dual Composition**: Supports both frontend and backend prompt assembly
+### 3. **PromptComposer** (`prompt_composer.py`) - **Registry-Based Assembly Engine**
 
-**Key Methods:**
-- `register_prompt_store()`: Associates component types with their stores
-- `compose_frontend_prompt()`: Assembles complete frontend prompts
-- `compose_backend_prompt()`: Assembles complete backend prompts
+**Core Abstraction**: Central orchestrator implementing registry pattern for dynamic prompt composition
+- **Interface Contract**: Stateless composition engine depending on registered `PromptStore<T>` implementations
+- **Dependency Inversion**: Depends on `PromptComponent` and `PromptStore` abstractions, not concrete store implementations
+- **Extension Points**: Store registry allows pluggable storage strategies without modifying composition logic
 
-#### 4. **Specialized Prompt Stores** (`prompt_stores/`)
-Type-specific implementations for each component category:
+**Registry Interface**:
+```python
+class PromptComposer:
+    @classmethod
+    def register_prompt_store(cls, component_type: Type[PromptComponent], store_type: Type[PromptStore])
+    
+    @classmethod
+    def compose_frontend_prompt(cls, components: List[PromptComponent]) -> str
+    
+    @classmethod  
+    def compose_backend_prompt(cls, components: List[PromptComponent]) -> str
+```
 
-- **TaskContextStore**: Manages task context prompts (UI generation focus)
-- **ModalityStore**: Handles input modality specifications
-- **TechConstraintStore**: Manages technical constraint prompts
-- **OutputControlStore**: Controls output compliance and formatting rules
+**Abstraction Benefits**:
+- **Registry Pattern**: Loose coupling between composer and stores through registration mechanism
+- **Type Safety**: Component type validation ensures only valid stores are registered
+- **Composition Strategy**: Aggregates prompts from multiple stores based on component types
+- **Stateless Design**: No internal state, enabling thread-safe operations
 
-## Key Features
+### 4. **Specialized Prompt Stores** (`prompt_stores/`) - **Concrete Implementations**
 
-- **Modular Architecture**: Component-based prompt building with clear separation of concerns
-- **Type Safety**: Full validation throughout the system using ABC patterns and type hints
-- **Dual Target Support**: Separate frontend and backend prompt composition
-- **Extensible Design**: Easy addition of new component types and stores
-- **Strongly Typed**: Enum-based components for explicit configuration
-- **Registry Pattern**: Centralized management of prompt stores and components
-- **Validation Layer**: Comprehensive error handling and type checking
+**Core Abstraction**: Type-specific implementations of `PromptStore<T>` interface demonstrating extension patterns
+- **Interface Implementation**: Each store implements `PromptStore<T>` contract for a specific component type
+- **Dependency Compliance**: All stores depend on `PromptComponent` abstraction and implement required abstract methods
+- **Extension Examples**: Show how to create new stores following the established abstraction patterns
+
+**Store Implementations**:
+- **`TaskContextStore(PromptStore[TaskContextComponent])`**: Manages WHAT to generate prompts
+- **`ModalityStore(PromptStore[ModalityComponent])`**: Handles HOW input is provided prompts  
+- **`TechConstraintStore(PromptStore[TechConstraintComponent])`**: Manages WHICH technologies prompts
+- **`OutputControlStore(PromptStore[OutputControlComponent])`**: Controls HOW to format output prompts
+- **`RefinementStore(PromptStore[RefinementComponent])`**: Manages WHAT improvements prompts
+
+**Implementation Pattern**:
+```python
+class TaskContextStore(PromptStore[TaskContextComponent]):
+    @classmethod
+    def prompt_component(cls) -> Type[TaskContextComponent]:
+        return TaskContextComponent  # Type constraint enforcement
+    
+    # Inherited CRUD methods with type safety for TaskContextComponent
+```
+
+## Architectural Benefits
+
+**Dependency Inversion Implementation**:
+- **Interface Dependencies**: `PromptComposer` depends on `PromptComponent` and `PromptStore<T>` abstractions
+- **Extension Without Modification**: New component types and stores added without changing composition logic
+- **Pluggable Architecture**: Store registry enables runtime configuration of storage strategies
+
+**Type Safety & Validation**:
+- **Compile-time Safety**: Generic type parameters and enum constraints prevent invalid configurations
+- **Runtime Validation**: ABC enforcement ensures proper interface implementation
+- **Type Parameter Constraints**: `PromptStore<T>` generic ensures stores manage only their declared component types
+
+**Separation of Concerns**:
+- **Component Definition**: `PromptComponent` hierarchy focuses solely on taxonomy
+- **Storage Responsibility**: `PromptStore<T>` implementations handle persistence concerns  
+- **Composition Logic**: `PromptComposer` focuses purely on assembly strategy
+- **Registry Management**: Clear separation between registration and composition operations
 
 ## Usage
 
@@ -75,15 +135,17 @@ from prompt_engine.prompt_component import (
     TaskContextComponent,
     ModalityComponent,
     TechConstraintComponent,
-    OutputControlComponent
+    OutputControlComponent,
+    RefinementComponent
 )
 
 # Frontend composition
 frontend_components = [
     TaskContextComponent.UI_GENERATION,
-    ModalityComponent.IMAGE_TEXT,
-    TechConstraintComponent.NEXTJS,
-    OutputControlComponent.STRICT_COMPLIANCE
+    ModalityComponent.IMAGE,
+    TechConstraintComponent.REACT,
+    OutputControlComponent.STRICT_COMPLIANCE,
+    RefinementComponent.FIX_A11Y
 ]
 frontend_prompt = PromptComposer.compose_frontend_prompt(frontend_components)
 
@@ -291,7 +353,8 @@ prompt_engine/
 │   ├── task_context_store.py # Task context prompt management
 │   ├── modality_store.py     # Input modality prompt management
 │   ├── tech_constraint_store.py # Technical constraint prompts
-│   └── output_control_store.py # Output control and compliance prompts
+│   ├── output_control_store.py # Output control and compliance prompts
+│   └── refinement_store.py   # Post-generation improvement prompts
 └── README.md                  # This documentation
 ```
 
